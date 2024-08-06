@@ -9,3 +9,4 @@ numpy
 python-dotenv
 PyPDF2 # Assuming PyPDFLoader relies on PyPDF2
 streamlit
+langchain-community
