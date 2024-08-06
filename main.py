@@ -4,7 +4,7 @@ import streamlit as st
 from src.helper import *
 from src.data_loader import *
 
-ResponseLLM = ResponseLLM()
+# ResponseLLM = ResponseLLM()
      
 def main():
     st.title("RAG Evaluation App")
