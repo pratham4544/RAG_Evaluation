@@ -17,12 +17,15 @@ from src.prompt import *
 
 load_dotenv()
 
-class ResponseLLM:
-    def __init__(self, model=None, embeddings=None, vectra_model=None):
-        # Initialize the model and embeddings, using defaults if none provided
-        self.model = model or ChatGroq(temperature=0.7, model="llama3-70b-8192", api_key=os.environ['GORQ_API_KEY'])
-        self.embeddings = embeddings or GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-        self.vectra_model = vectra_model or AutoModelForSequenceClassification.from_pretrained('vectara/hallucination_evaluation_model', trust_remote_code=True)
+vectra_model = AutoModelForSequenceClassification.from_pretrained('vectara/hallucination_evaluation_model', trust_remote_code=True)
+
+
+# class ResponseLLM:
+#     def __init__(self, model=None, embeddings=None, vectra_model=None):
+#         # Initialize the model and embeddings, using defaults if none provided
+#         self.model = model or ChatGroq(temperature=0.7, model="llama3-70b-8192", api_key=os.environ['GORQ_API_KEY'])
+#         self.embeddings = embeddings or GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+#         self.vectra_model = vectra_model or AutoModelForSequenceClassification.from_pretrained('vectara/hallucination_evaluation_model', trust_remote_code=True)
 
 def load_pdf(ebook):
     # Prepare vector store (FAISS)
