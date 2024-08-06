@@ -19,14 +19,14 @@ def main():
         db = load_pdf(document_data)
         harry_qa_chain, retriever = load_llm(db)
         
-        question = csv_data['Question'].tolist()
+        question = csv_data['question'].tolist()
         model_answer, model_context = get_answer(question,harry_qa_chain,retriever)
         
         data = load_data(question, model_answer, model_context)
         
         final, score = vectra_classifications(data, ResponseLLM.vectra_model)
         
-        vectra_output =store_vectra(questions=question,answer=model_answer, final,score)
+        vectra_output =store_vectra(questions=question,answer=model_answer, final=final,score=score)
 
         st.subheader("Detailed Evaluation Data")
         st.dataframe(vectra_output)
