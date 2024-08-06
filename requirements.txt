@@ -1,0 +1,11 @@
+langchain  # Replace with the specific version you're using
+langchain_openai  # Replace with the specific version you're using
+langchain_google_genai  # Replace with the specific version you're using
+langchain_ai21  # Replace with the specific version you're using
+langchain_groq  # Replace with the specific version you're using
+transformers  # Example version, replace with your specific version
+pandas
+numpy
+python-dotenv
+PyPDF2 # Assuming PyPDFLoader relies on PyPDF2
+streamlit
