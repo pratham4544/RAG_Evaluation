@@ -13,16 +13,10 @@ def process_uploaded_file(uploaded_file):
     if 'questions' in df.columns and 'ground_truths' in df.columns:
         st.success("CSV file loaded successfully!")
         st.write("Here is a preview of your CSV file:")
-        st.write(df)
+        st.write(df.head())
         
         questions_list = df['questions'].tolist()
         ground_truths_list = df['ground_truths'].tolist()
-        
-        # st.write("Extracted 'questions' column as a list:")
-        # st.write(questions_list)
-        
-        # st.write("Extracted 'ground_truths' column as a list:")
-        # st.write(ground_truths_list)
         
         return questions_list, ground_truths_list
     else:
@@ -34,41 +28,44 @@ def main():
     
     # File uploader to allow users to upload a CSV file
     uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
-    pdf_file = st.file_uploader("Upload your refrence PDF file", type=['pdf'])
+    pdf_file = st.file_uploader("Upload your reference PDF file", type=['pdf'])
     
     if st.button('Submit'):
         if uploaded_file is not None:
-            questions_list, ground_truths_list = process_uploaded_file(uploaded_file)
-            
-            if questions_list and ground_truths_list:
-                st.write('Started Working..')
+            if pdf_file is not None:
+                questions_list, ground_truths_list = process_uploaded_file(uploaded_file)
+                
+                if questions_list and ground_truths_list:
+                    st.write('Started Working..')
 
-                response = ResponseLLM()
+                    response = ResponseLLM()
 
-                chain, retriever = response.llm_response(pdf_file.name)
+                    chain, retriever = response.llm_response(pdf_file.name)
 
-                st.write('Generating Answer..')
-                model_answer, model_contexts = response.store_response(questions_list, chain, retriever)
+                    st.write('Generating Answer..')
+                    model_answer, model_contexts = response.store_response(questions_list, chain, retriever)
 
-                st.write('RAGAS Evaluation Starts..')
-                ragas_result = response.ragas_eval(questions_list, ground_truths_list, model_answer, model_contexts)
-                st.dataframe(ragas_result.head())
-                create_download_button(ragas_result, "ragas_results.csv")
+                    st.write('RAGAS Evaluation Starts..')
+                    ragas_result = response.ragas_eval(questions_list, ground_truths_list, model_answer, model_contexts)
+                    st.dataframe(ragas_result.head())
+                    create_download_button(ragas_result, "ragas_results.csv")
 
-                st.write('BERT Evaluations Starts..')
-                bert_score = response.bert_eval(questions_list, model_answer, ground_truths_list)
-                st.dataframe(bert_score.head())
-                create_download_button(bert_score, "bert_score_results.csv")
+                    st.write('BERT Evaluations Starts..')
+                    bert_score = response.bert_eval(questions_list, model_answer, ground_truths_list)
+                    st.dataframe(bert_score.head())
+                    create_download_button(bert_score, "bert_score_results.csv")
 
-                st.write('Phoenix Evaluations Starts..')
-                phoenix_result = response.phoenix_eval(questions_list, model_answer, model_contexts)
-                st.dataframe(phoenix_result.head())
-                create_download_button(phoenix_result, "phoenix_results.csv")
+                    st.write('Phoenix Evaluations Starts..')
+                    phoenix_result = response.phoenix_eval(questions_list, model_answer, model_contexts)
+                    st.dataframe(phoenix_result.head())
+                    create_download_button(phoenix_result, "phoenix_results.csv")
 
-                st.write('Vectra Evaluations Starts..')
-                vectra_result = response.vectra_eval(questions_list, model_contexts, model_answer, ground_truths_list)
-                st.dataframe(vectra_result.head())
-                create_download_button(vectra_result, "vectra_results.csv")
+                    st.write('Vectra Evaluations Starts..')
+                    vectra_result = response.vectra_eval(questions_list, model_contexts, model_answer, ground_truths_list)
+                    st.dataframe(vectra_result.head())
+                    create_download_button(vectra_result, "vectra_results.csv")
+            else:
+                st.error("Please upload a PDF file.")
         else:
             st.info("Please upload a CSV file.")
 
