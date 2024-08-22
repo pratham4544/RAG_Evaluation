@@ -18,11 +18,11 @@ def process_uploaded_file(uploaded_file):
         questions_list = df['questions'].tolist()
         ground_truths_list = df['ground_truths'].tolist()
         
-        st.write("Extracted 'questions' column as a list:")
-        st.write(questions_list)
+        # st.write("Extracted 'questions' column as a list:")
+        # st.write(questions_list)
         
-        st.write("Extracted 'ground_truths' column as a list:")
-        st.write(ground_truths_list)
+        # st.write("Extracted 'ground_truths' column as a list:")
+        # st.write(ground_truths_list)
         
         return questions_list, ground_truths_list
     else:
@@ -34,7 +34,7 @@ def main():
     
     # File uploader to allow users to upload a CSV file
     uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
-    pdf_file = st.file("Upload your refrence PDF file", type=['pdf'])
+    pdf_file = st.file_uploader("Upload your refrence PDF file", type=['pdf'])
     
     if st.button('Submit'):
         if uploaded_file is not None:
