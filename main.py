@@ -34,6 +34,7 @@ def main():
     
     # File uploader to allow users to upload a CSV file
     uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
+    pdf_file = st.file("Upload your refrence PDF file", type=['pdf'])
     
     if st.button('Submit'):
         if uploaded_file is not None:
@@ -44,7 +45,7 @@ def main():
 
                 response = ResponseLLM()
 
-                chain, retriever = response.llm_response(uploaded_file.name)
+                chain, retriever = response.llm_response(pdf_file.name)
 
                 st.write('Generating Answer..')
                 model_answer, model_contexts = response.store_response(questions_list, chain, retriever)
