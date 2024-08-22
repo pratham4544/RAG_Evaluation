@@ -1,35 +1,75 @@
-# streamlit_app.py
-
 import streamlit as st
-from src.helper import *
-from src.data_loader import *
+import pandas as pd
+from src.helper import ResponseLLM
 
-# ResponseLLM = ResponseLLM()
-     
+def create_download_button(dataframe, filename):
+    csv = dataframe.to_csv(index=False)
+    st.download_button(label="Download CSV", data=csv, file_name=filename, mime='text/csv')
+
+def process_uploaded_file(uploaded_file):
+    df = pd.read_csv(uploaded_file)
+    
+    # Check if required columns are present
+    if 'questions' in df.columns and 'ground_truths' in df.columns:
+        st.success("CSV file loaded successfully!")
+        st.write("Here is a preview of your CSV file:")
+        st.write(df)
+        
+        questions_list = df['questions'].tolist()
+        ground_truths_list = df['ground_truths'].tolist()
+        
+        st.write("Extracted 'questions' column as a list:")
+        st.write(questions_list)
+        
+        st.write("Extracted 'ground_truths' column as a list:")
+        st.write(ground_truths_list)
+        
+        return questions_list, ground_truths_list
+    else:
+        st.error("CSV file must contain 'questions' and 'ground_truths' columns.")
+        return None, None
+
 def main():
-    st.title("RAG Evaluation App")
+    st.header('RAG Evaluations')
     
-    csv_file = st.file_uploader("Upload CSV File", type=["csv"])
-    document_file = st.file_uploader("Upload Document File", type=["txt", "pdf", "docx"])
+    # File uploader to allow users to upload a CSV file
+    uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
     
-    if csv_file and document_file:
-        csv_data = load_csv(csv_file)
-        document_data = load_document(document_file)
-        
-        db = load_pdf(document_data)
-        harry_qa_chain, retriever = load_llm(db)
-        
-        question = csv_data['question'].tolist()
-        model_answer, model_context = get_answer(question,harry_qa_chain,retriever)
-        
-        data = load_data(question, model_answer, model_context)
-        
-        final, score = vectra_classifications(data, ResponseLLM.vectra_model)
-        
-        vectra_output =store_vectra(questions=question,answer=model_answer, final=final,score=score)
+    if st.button('Submit'):
+        if uploaded_file is not None:
+            questions_list, ground_truths_list = process_uploaded_file(uploaded_file)
+            
+            if questions_list and ground_truths_list:
+                st.write('Started Working..')
 
-        st.subheader("Detailed Evaluation Data")
-        st.dataframe(vectra_output)
-    
+                response = ResponseLLM()
+
+                chain, retriever = response.llm_response(uploaded_file.name)
+
+                st.write('Generating Answer..')
+                model_answer, model_contexts = response.store_response(questions_list, chain, retriever)
+
+                st.write('RAGAS Evaluation Starts..')
+                ragas_result = response.ragas_eval(questions_list, ground_truths_list, model_answer, model_contexts)
+                st.dataframe(ragas_result.head())
+                create_download_button(ragas_result, "ragas_results.csv")
+
+                st.write('BERT Evaluations Starts..')
+                bert_score = response.bert_eval(questions_list, model_answer, ground_truths_list)
+                st.dataframe(bert_score.head())
+                create_download_button(bert_score, "bert_score_results.csv")
+
+                st.write('Phoenix Evaluations Starts..')
+                phoenix_result = response.phoenix_eval(questions_list, model_answer, model_contexts)
+                st.dataframe(phoenix_result.head())
+                create_download_button(phoenix_result, "phoenix_results.csv")
+
+                st.write('Vectra Evaluations Starts..')
+                vectra_result = response.vectra_eval(questions_list, model_contexts, model_answer, ground_truths_list)
+                st.dataframe(vectra_result.head())
+                create_download_button(vectra_result, "vectra_results.csv")
+        else:
+            st.info("Please upload a CSV file.")
+
 if __name__ == "__main__":
     main()
