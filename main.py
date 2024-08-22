@@ -40,6 +40,9 @@ def main():
 
                     response = ResponseLLM()
 
+                    with open(pdf_file.name, mode='wb') as w:
+                        w.write(pdf_file.getvalue())
+
                     chain, retriever = response.llm_response(pdf_file.name)
 
                     st.write('Generating Answer..')
