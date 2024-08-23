@@ -34,6 +34,8 @@ def main():
         if uploaded_file is not None:
             if pdf_file is not None:
                 questions_list, ground_truths_list = process_uploaded_file(uploaded_file)
+                pdf_data = pdf_file.name
+                st.wrtie('PDF DATA ',pdf_data)
                 
                 if questions_list and ground_truths_list:
                     st.write('Started Working..')
@@ -43,9 +45,9 @@ def main():
                     with open(pdf_file.name, mode='wb') as w:
                         w.write(pdf_file.getvalue())
 
-                    text = response.get_text_file(pdf_file.name)
+                    text = response.get_text_file(pdf_data)
 
-                    chain, retriever = response.llm_response(pdf_file.name)
+                    chain, retriever = response.llm_response(pdf_data)
 
                     st.write('Generating Answer..')
                     model_answer, model_contexts = response.store_response(questions_list, chain, retriever)
