@@ -35,7 +35,7 @@ def main():
             if pdf_file is not None:
                 questions_list, ground_truths_list = process_uploaded_file(uploaded_file)
                 pdf_data = pdf_file.name
-                st.wrtie('PDF DATA ',pdf_data)
+                st.write('PDF DATA ',pdf_data)
                 
                 if questions_list and ground_truths_list:
                     st.write('Started Working..')
