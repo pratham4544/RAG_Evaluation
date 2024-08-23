@@ -91,7 +91,18 @@ class ResponseLLM:
         self.critic_model = ChatGroq(temperature=0, model_name='llama-3.1-70b-versatile')
         self.openai_model = OpenAIModel(model="gpt-3.5-turbo",temperature=0.0)
 
-    def llm_response(pdf_path):
+    def get_file_text(self, file_paths):
+        text = ""
+        for file_path in file_paths:
+            _, file_extension = os.path.splitext(file_path.name)
+            if file_extension == ".pdf":
+                with file_path as pdf_file:
+                    pdf_reader = PdfReader(pdf_file)
+                    for page in pdf_reader.pages:
+                        text += page.extract_text()
+        return text
+
+    def llm_response(self, pdf_path):
 
         loader = PyPDFLoader(pdf_path)
         docs = loader.load()
