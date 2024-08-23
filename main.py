@@ -42,10 +42,10 @@ def main():
 
                     response = ResponseLLM()
 
-                    with open(pdf_file.name, mode='wb') as w:
-                        w.write(pdf_file.getvalue())
+                    # with open(pdf_file.name, mode='wb') as w:
+                    #     w.write(pdf_file.getvalue())
 
-                    text = response.get_text_file(pdf_data)
+                    # text = response.get_text_file(pdf_data)
 
                     chain, retriever = response.llm_response(pdf_data)
 
