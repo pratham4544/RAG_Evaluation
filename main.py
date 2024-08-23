@@ -43,6 +43,8 @@ def main():
                     with open(pdf_file.name, mode='wb') as w:
                         w.write(pdf_file.getvalue())
 
+                    text = response.get_text_file(pdf_file.name)
+
                     chain, retriever = response.llm_response(pdf_file.name)
 
                     st.write('Generating Answer..')
