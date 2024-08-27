@@ -50,7 +50,8 @@ def main():
 
                     st.write('RAGAS Evaluation Starts..')
                     ragas_result = response.ragas_eval(questions_list, ground_truths_list, model_answer, model_contexts)
-                    st.dataframe(ragas_result.head())
+                    df = pd.DataFrame(ragas_result)
+                    st.dataframe(df.head())
                     create_download_button(ragas_result, "ragas_results.csv")
 
                     st.write('BERT Evaluation Starts..')
