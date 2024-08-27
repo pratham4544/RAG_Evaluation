@@ -59,15 +59,15 @@ def main():
                     st.dataframe(bert_score.head())
                     create_download_button(bert_score, "bert_score_results.csv")
 
-                    # st.write('Phoenix Evaluation Starts..')
-                    # phoenix_result = response.phoenix_eval(questions_list, model_answer, model_contexts)
-                    # st.dataframe(phoenix_result.head())
-                    # create_download_button(phoenix_result, "phoenix_results.csv")
+                    st.write('Phoenix Evaluation Starts..')
+                    phoenix_result = response.phoenix_eval(questions_list, model_answer, model_contexts)
+                    st.dataframe(phoenix_result.head())
+                    create_download_button(phoenix_result, "phoenix_results.csv")
 
-                    # st.write('Vectra Evaluation Starts..')
-                    # vectra_result = response.vectra_eval(questions_list, model_contexts, model_answer, ground_truths_list)
-                    # st.dataframe(vectra_result.head())
-                    # create_download_button(vectra_result, "vectra_results.csv")
+                    st.write('Vectra Evaluation Starts..')
+                    vectra_result = response.vectra_eval(questions_list, model_contexts, model_answer, ground_truths_list)
+                    st.dataframe(vectra_result.head())
+                    create_download_button(vectra_result, "vectra_results.csv")
             else:
                 st.error("Please upload a PDF file.")
         else:
