@@ -100,8 +100,9 @@ class ResponseLLM:
                                     context_entity_recall,
                                     answer_similarity],
                            llm=self.critic_model, embeddings=self.embeddings)
-
-        results.to_pandas().to_csv('ragas_results.csv')
+        results = results.to_pandas()
+        results.to_csv('ragas_results.csv')
+             
 
         return results
 
