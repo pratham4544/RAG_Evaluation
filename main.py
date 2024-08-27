@@ -26,15 +26,6 @@ def process_uploaded_file(uploaded_file):
 def main():
     st.header('RAG Evaluations')
     
-    # API Key input
-    # openai_api_key = st.text_input("Enter your OpenAI API key", type="password")
-    
-    # Checkboxes for selecting evaluations
-    run_ragas = st.checkbox('Run RAGAS Evaluation')
-    run_bert = st.checkbox('Run BERT Evaluation')
-    run_phoenix = st.checkbox('Run Phoenix Evaluation')
-    run_vectra = st.checkbox('Run Vectra Evaluation')
-    
     # File uploader to allow users to upload a CSV file
     uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
     pdf_file = st.file_uploader("Upload your reference PDF file", type=['pdf'])
@@ -42,57 +33,40 @@ def main():
     if st.button('Submit'):
         if uploaded_file is not None:
             if pdf_file is not None:
-                if openai_api_key:
-                    questions_list, ground_truths_list = process_uploaded_file(uploaded_file)
+                questions_list, ground_truths_list = process_uploaded_file(uploaded_file)
                 
-                    if questions_list and ground_truths_list:
-                        st.write('Started Working..')
+                if questions_list and ground_truths_list:
+                    st.write('Started Working..')
 
-                        # Save the uploaded PDF temporarily
-                        with open(pdf_file.name, mode='wb') as f:
-                            f.write(pdf_file.getvalue())
+                    # Save the uploaded PDF temporarily
+                    with open(pdf_file.name, mode='wb') as f:
+                        f.write(pdf_file.getvalue())
 
-                        response = ResponseLLM()
+                    response = ResponseLLM()
+                    chain, retriever = response.llm_response(pdf_file.name)
 
-                        # Update the OpenAI model with the provided API key
-                        # response.openai_model = OpenAIModel(model="gpt-3.5-turbo", temperature=0.0, openai_api_key=openai_api_key)
-                        
-                        chain, retriever = response.llm_response(pdf_file.name)
+                    st.write('Generating Answer..')
+                    model_answer, model_contexts = response.store_response(questions_list, chain, retriever)
 
-                        st.write('Generating Answer..')
-                        model_answer, model_contexts = response.store_response(questions_list, chain, retriever)
+                    st.write('RAGAS Evaluation Starts..')
+                    ragas_result = response.ragas_eval(questions_list, ground_truths_list, model_answer, model_contexts)
+                    st.dataframe(ragas_result.head())
+                    create_download_button(ragas_result, "ragas_results.csv")
 
-                        # RAGAS Evaluation
-                        if run_ragas:
-                            st.write('RAGAS Evaluation Starts..')
-                            ragas_result = response.ragas_eval(questions_list, ground_truths_list, model_answer, model_contexts)
-                            st.dataframe(ragas_result.head())
-                            create_download_button(ragas_result, "ragas_results.csv")
+                    st.write('BERT Evaluation Starts..')
+                    bert_score = response.bert_eval(questions_list, model_answer, ground_truths_list)
+                    st.dataframe(bert_score.head())
+                    create_download_button(bert_score, "bert_score_results.csv")
 
-                        # BERT Evaluation
-                        if run_bert:
-                            st.write('BERT Evaluation Starts..')
-                            bert_score = response.bert_eval(questions_list, model_answer, ground_truths_list)
-                            st.dataframe(bert_score.head())
-                            create_download_button(bert_score, "bert_score_results.csv")
+                    st.write('Phoenix Evaluation Starts..')
+                    phoenix_result = response.phoenix_eval(questions_list, model_answer, model_contexts)
+                    st.dataframe(phoenix_result.head())
+                    create_download_button(phoenix_result, "phoenix_results.csv")
 
-                        # Phoenix Evaluation
-                        if run_phoenix:
-                            st.write('Phoenix Evaluation Starts..')
-                            phoenix_result = response.phoenix_eval(questions_list, model_answer, model_contexts)
-                            st.dataframe(phoenix_result.head())
-                            create_download_button(phoenix_result, "phoenix_results.csv")
-
-                        # Vectra Evaluation
-                        if run_vectra:
-                            st.write('Vectra Evaluation Starts..')
-                            vectra_result = response.vectra_eval(questions_list, model_contexts, model_answer, ground_truths_list)
-                            st.dataframe(vectra_result.head())
-                            create_download_button(vectra_result, "vectra_results.csv")
-                    else:
-                        st.error("Please check the content of your CSV file.")
-                else:
-                    st.error("Please provide your OpenAI API key.")
+                    st.write('Vectra Evaluation Starts..')
+                    vectra_result = response.vectra_eval(questions_list, model_contexts, model_answer, ground_truths_list)
+                    st.dataframe(vectra_result.head())
+                    create_download_button(vectra_result, "vectra_results.csv")
             else:
                 st.error("Please upload a PDF file.")
         else:
