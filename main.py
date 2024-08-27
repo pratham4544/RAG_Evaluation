@@ -27,7 +27,7 @@ def main():
     st.header('RAG Evaluations')
     
     # API Key input
-    openai_api_key = st.text_input("Enter your OpenAI API key", type="password")
+    # openai_api_key = st.text_input("Enter your OpenAI API key", type="password")
     
     # Checkboxes for selecting evaluations
     run_ragas = st.checkbox('Run RAGAS Evaluation')
@@ -55,7 +55,7 @@ def main():
                         response = ResponseLLM()
 
                         # Update the OpenAI model with the provided API key
-                        response.openai_model = OpenAIModel(model="gpt-3.5-turbo", temperature=0.0, openai_api_key=openai_api_key)
+                        # response.openai_model = OpenAIModel(model="gpt-3.5-turbo", temperature=0.0, openai_api_key=openai_api_key)
                         
                         chain, retriever = response.llm_response(pdf_file.name)
 
